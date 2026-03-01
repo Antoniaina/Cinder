@@ -1,0 +1,4 @@
+/mnt/d/Proj/Cinder/CMakeFiles/cinder.dir
+/mnt/d/Proj/Cinder/CMakeFiles/minimal.dir
+/mnt/d/Proj/Cinder/CMakeFiles/edit_cache.dir
+/mnt/d/Proj/Cinder/CMakeFiles/rebuild_cache.dir
