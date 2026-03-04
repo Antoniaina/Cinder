@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcinder.a CMakeFiles/cinder.dir/src/server.c.o
-/usr/bin/ranlib libcinder.a

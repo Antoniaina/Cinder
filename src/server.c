@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include<stdlib.h>
 
-#include "cinder/server.h"
+#include <cinder/server.h>
+#include <cinder/platform.h>
 
 struct cinder_server {
     cinder_server_config_t config;
+    cinder_socket_t *socket;
 };
 
 cinder_server_t* cinder_server_create( const cinder_server_config_t *config)
-{
+{   
     if (!config)
         return NULL;
 
@@ -27,10 +29,27 @@ void cinder_server_destroy(cinder_server_t* server)
 }
 
 int cinder_server_start(cinder_server_t *server)
-{
-    if (!server)
-        return -1;
+{   
+    const char response[] =
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Length: 17\r\n\r\n"
+        "Hello from cinder";
 
-    printf("Server listening on port %u\n", server->config.port);
+    server->socket = cinder_socket_open();
+    cinder_socket_bind(server->socket, server->config.port);
+    cinder_socket_listen(server->socket);
+
+    while (1) {
+        cinder_socket_t *client = cinder_socket_accept(server->socket);
+
+        if (!client)
+            continue;
+
+        cinder_socket_send(client, response, sizeof(response) -1);
+
+        cinder_socket_close(client);        
+    }
+
     return 0;
+        
 }
