@@ -3,6 +3,7 @@
 
 #include <cinder/server.h>
 #include <cinder/platform.h>
+#include <cinder/http.h>
 
 struct cinder_server {
     cinder_server_config_t config;
@@ -44,6 +45,16 @@ int cinder_server_start(cinder_server_t *server)
 
         if (!client)
             continue;
+
+        cinder_request_t req;
+
+        if(!cinder_http_read(client, &req)) {
+            if (!cinder_http_parse_request_line(&req)) {
+                printf("method: %s\n", req.method);
+                printf("path: %s\n", req.path);
+                printf("version: %s\n", req.version);
+            }
+        }
 
         cinder_socket_send(client, response, sizeof(response) -1);
 

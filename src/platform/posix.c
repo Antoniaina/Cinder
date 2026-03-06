@@ -65,3 +65,11 @@ void cinder_socket_close(cinder_socket_t *sock)
     close(sock->fd);
     free(sock);
 }
+
+int cinder_socket_read(cinder_socket_t *sock, void *buffer, size_t size)
+{
+    if (!sock)
+        return -1;
+
+    return read(sock->fd, buffer, size);
+}

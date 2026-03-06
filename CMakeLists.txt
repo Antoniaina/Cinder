@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 add_library(cinder 
     src/server.c
     src/platform/posix.c
+    src/http.c
 )
 
 target_include_directories(cinder PUBLIC include)
