@@ -13,5 +13,7 @@ add_library(cinder
 
 target_include_directories(cinder PUBLIC include)
 
+add_compile_definitions(ENABLE_DEBUG)
+
 add_executable(minimal examples/minimal.c)
 target_link_libraries(minimal cinder)

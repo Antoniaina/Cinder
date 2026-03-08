@@ -13,21 +13,28 @@ struct cinder_server {
 
 cinder_server_t* cinder_server_create( const cinder_server_config_t *config)
 {   
-    if (!config)
+    if (!config) {
+        CINDER_ERROR("server", "create failed: config is NULL");
         return NULL;
+    }
 
     cinder_server_t *server = malloc(sizeof(*server));
-    if (!server)
+    if (!server) {
+        CINDER_ERROR("server", "create failed: memory allocation failed");
         return NULL;
+    }
 
-    
     server->config = *config;
+    CINDER_DEBUG("server", "server instance created on port %u", config->port);
     return server;
 }
 
 void cinder_server_destroy(cinder_server_t* server)
 {
-    free(server);
+    if (server) {
+        CINDER_DEBUG("server", "destroying server instance");
+        free(server);
+    }
 }
 
 int cinder_server_start(cinder_server_t *server)
@@ -39,29 +46,53 @@ int cinder_server_start(cinder_server_t *server)
         "Hello from cinder";
 
     server->socket = cinder_socket_open();
-    cinder_socket_bind(server->socket, server->config.port);
-    cinder_socket_listen(server->socket);
+    if (!server->socket) {
+        CINDER_ERROR("server", "failed to open socket");
+        return -1;
+    }
+
+    if (cinder_socket_bind(server->socket, server->config.port) < 0) {
+        CINDER_ERROR("server", "failed to bind to port %u", server->config.port);
+        return -1;
+    }
+
+    if (cinder_socket_listen(server->socket) < 0) {
+        CINDER_ERROR("server", "failed to listen on socket");
+        return -1;
+    }
+
     CINDER_INFO("server", "listening on port %u", server->config.port);
 
     while (1) {
         cinder_socket_t *client = cinder_socket_accept(server->socket);
 
-        if (!client)
+        if (!client) {
+            CINDER_ERROR("server", "accept failed");
             continue;
-        
+        }
         CINDER_INFO("server", "client connected");
 
         cinder_request_t req;
 
-        if(!cinder_http_read(client, &req)) {
-            if (!cinder_http_parse_request_line(&req)) {
+        if (cinder_http_read(client, &req) == 0) {
+            if (cinder_http_parse_request_line(&req) == 0) {
                 CINDER_INFO("http", "%s %s", req.method, req.path);
+            } else {
+                CINDER_DEBUG("http", "failed to parse request line");
             }
+        } else {
+            CINDER_DEBUG("http", "failed to read request from client");
         }
 
-        cinder_socket_send(client, response, sizeof(response) -1);
+        int sent = cinder_socket_send(client, response, sizeof(response) - 1);
+        if (sent < 0) {
+            CINDER_ERROR("server", "failed to send response to client");
+        } else {
+            CINDER_DEBUG("server", "sent %d bytes to client", sent);
+        }
 
-        cinder_socket_close(client);        
+        cinder_socket_close(client);
+        CINDER_DEBUG("server", "client disconnected");
     }
 
     return 0;
