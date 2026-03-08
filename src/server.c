@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include<stdlib.h>
 
+#include <cinder/log.h>
 #include <cinder/server.h>
 #include <cinder/platform.h>
 #include <cinder/http.h>
@@ -31,6 +32,7 @@ void cinder_server_destroy(cinder_server_t* server)
 
 int cinder_server_start(cinder_server_t *server)
 {   
+    CINDER_INFO("server", "starting cinder server");
     const char response[] =
         "HTTP/1.1 200 OK\r\n"
         "Content-Length: 17\r\n\r\n"
@@ -39,20 +41,21 @@ int cinder_server_start(cinder_server_t *server)
     server->socket = cinder_socket_open();
     cinder_socket_bind(server->socket, server->config.port);
     cinder_socket_listen(server->socket);
+    CINDER_INFO("server", "listening on port %u", server->config.port);
 
     while (1) {
         cinder_socket_t *client = cinder_socket_accept(server->socket);
 
         if (!client)
             continue;
+        
+        CINDER_INFO("server", "client connected");
 
         cinder_request_t req;
 
         if(!cinder_http_read(client, &req)) {
             if (!cinder_http_parse_request_line(&req)) {
-                printf("method: %s\n", req.method);
-                printf("path: %s\n", req.path);
-                printf("version: %s\n", req.version);
+                CINDER_INFO("http", "%s %s", req.method, req.path);
             }
         }
 

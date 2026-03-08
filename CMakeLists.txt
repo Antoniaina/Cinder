@@ -8,6 +8,7 @@ add_library(cinder
     src/server.c
     src/platform/posix.c
     src/http.c
+    src/log.c
 )
 
 target_include_directories(cinder PUBLIC include)
