@@ -23,14 +23,11 @@ int cinder_http_read(cinder_socket_t* sock, cinder_request_t *req)
         return -1;
     }
 
-    if (n == 0) {
-        CINDER_DEBUG("http", "client closed connection (0 bytes read)");
+    if (n == 0)
         return -1;
-    }
 
     req->raw[n] = '\0';
     req->length = (size_t)n;
-    CINDER_DEBUG("http", "read %zd bytes from client", n);
 
     return 0;
 }
@@ -42,10 +39,8 @@ int cinder_http_parse_request_line(cinder_request_t *req)
         return -1;
     }
 
-    if (req->length == 0) {
-        CINDER_DEBUG("http", "parse failed: empty request");
+    if (req->length == 0)
         return -1;
-    }
 
     char *buffer = req->raw;
 
@@ -53,10 +48,8 @@ int cinder_http_parse_request_line(cinder_request_t *req)
     while (*buffer && *buffer != ' ')
         buffer++;
 
-    if (*buffer == '\0') {
-        CINDER_DEBUG("http", "parse failed: invalid request format (method)");
+    if (*buffer == '\0')
         return -1;
-    }
 
     *buffer = '\0';
     buffer++;
@@ -65,16 +58,13 @@ int cinder_http_parse_request_line(cinder_request_t *req)
     while (*buffer && *buffer != ' ')
         buffer++;
 
-    if (*buffer == '\0') {
-        CINDER_DEBUG("http", "parse failed: invalid request format (path)");
+    if (*buffer == '\0')
         return -1;
-    }
 
     *buffer = '\0';
     buffer++;
 
     req->version = buffer;
-    CINDER_DEBUG("http", "parsed request: %s %s %s", req->method, req->path, req->version);
 
     return 0;
 }

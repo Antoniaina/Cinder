@@ -28,7 +28,6 @@ cinder_socket_t* cinder_socket_open(void)
         return NULL;
     }
 
-    CINDER_DEBUG("platform", "socket created (fd=%d)", sock->fd);
     return sock;
 }
 
@@ -50,7 +49,6 @@ int cinder_socket_bind(cinder_socket_t *sock, int port)
         return -1;
     }
 
-    CINDER_DEBUG("platform", "socket bound to port %d", port);
     return ret;
 }
 
@@ -67,7 +65,6 @@ int cinder_socket_listen(cinder_socket_t* sock)
         return -1;
     }
 
-    CINDER_DEBUG("platform", "socket listening (backlog=16)");
     return ret;
 }
 
@@ -92,7 +89,6 @@ cinder_socket_t* cinder_socket_accept(cinder_socket_t *sock)
     }
 
     client->fd = fd;
-    CINDER_DEBUG("platform", "accepted connection (client_fd=%d)", fd);
     return client;
 }
 
@@ -117,7 +113,6 @@ void cinder_socket_close(cinder_socket_t *sock)
     if (!sock)
         return;
 
-    CINDER_DEBUG("platform", "closing socket (fd=%d)", sock->fd);
     close(sock->fd);
     free(sock);
 }

@@ -5,6 +5,7 @@
 
 #define CINDER_HTTP_MAX_REQUEST 4096
 
+
 typedef struct {
     char raw[CINDER_HTTP_MAX_REQUEST];
     size_t length;
